@@ -63,6 +63,10 @@ public abstract class RiemannBundle<T extends Configuration> implements Configur
                                 .addAll(riemannConfig.getTags())
                                 .build();
                         RiemannReporter.Builder builder = RiemannReporter.forRegistry(environment.metrics()).tags(tags)
+                                .prefixedWith(Joiner.on(".")
+                                        .join(riemannConfig.getNamespace(), riemannConfig.getEnvironment(),
+                                                riemannConfig.getService()))
+                                .useSeparator(".")
                                 .convertDurationsTo(TimeUnit.MILLISECONDS).convertRatesTo(TimeUnit.SECONDS);
                         riemannReporter = builder.build(riemann);
                         riemannReporter.start(riemannConfig.getPollingInterval(), TimeUnit.SECONDS);
