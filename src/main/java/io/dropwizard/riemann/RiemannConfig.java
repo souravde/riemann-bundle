@@ -17,7 +17,11 @@
 package io.dropwizard.riemann;
 
 import lombok.*;
+import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -29,18 +33,24 @@ import java.util.List;
 @Builder
 public class RiemannConfig {
 
+    @NotEmpty
     private String host;
 
-    private int port;
+    private int port = 5556;
 
-    private String namespace;
+    @NotEmpty
+    private String namespace = "default";
 
+    @NotEmpty
     private String service;
 
-    private String environment;
+    @NotEmpty
+    private String environment = "default";
 
+    @Max(3600)
+    @Min(10)
     private int pollingInterval = 30;
 
     @Singular
-    private List<String> tags;
+    private List<String> tags = Collections.emptyList();
 }
