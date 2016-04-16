@@ -60,7 +60,6 @@ riemann:
   namespace: mycompany
   service: myservice
   environment: myenvironment
-  prefix: Bearer
   pollingInterval: 60 
   tags:
     - mytag1
