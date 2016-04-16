@@ -41,7 +41,7 @@ Use the following maven dependency:
 #### Bootstrap
 ```java
     @Override
-    public void run(Configuration configuration, Environment environment) {
+    public void initialize(Bootstrap<?> bootstrap) {
         bootstrap.addBundle(new RiemannBundle() {
             
             @Override
