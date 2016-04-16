@@ -21,6 +21,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import io.dropwizard.Configuration;
 import io.dropwizard.ConfiguredBundle;
+import io.dropwizard.lifecycle.Managed;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +38,8 @@ public abstract class RiemannBundle<T extends Configuration> implements Configur
 
     private static Riemann riemann;
 
+    private static RiemannReporter riemannReporter;
+
     public abstract RiemannConfig getRiemannConfiguration(T configuration);
 
     @Override
@@ -46,25 +49,40 @@ public abstract class RiemannBundle<T extends Configuration> implements Configur
 
     @Override
     public void run(T configuration, Environment environment) {
-        if (riemann == null) {
-            final val riemannConfig = getRiemannConfiguration(configuration);
-            try {
-                riemann = new Riemann(riemannConfig.getHost(), riemannConfig.getPort());
-                final val tags = ImmutableList.<String>builder()
-                        .add(riemannConfig.getNamespace())
-                        .add(riemannConfig.getEnvironment())
-                        .add(riemannConfig.getService())
-                        .addAll(riemannConfig.getTags())
-                        .build();
-                RiemannReporter.Builder builder = RiemannReporter.forRegistry(environment.metrics()).tags(tags)
-                        .convertDurationsTo(TimeUnit.MILLISECONDS).convertRatesTo(TimeUnit.SECONDS);
-                RiemannReporter riemannReporter = builder.build(riemann);
-                riemannReporter.start(riemannConfig.getPollingInterval(), TimeUnit.SECONDS);
-                log.info("Started Riemann metrics reporter on {}:{} with tags: {}", riemannConfig.getHost(),
-                        riemannConfig.getPort(), Joiner.on(",").join(tags));
-            } catch (IOException e) {
-                log.error("Error starting Riemann reporter", e);
+        environment.lifecycle().manage(new Managed() {
+            @Override
+            public void start() throws Exception {
+                if (riemann == null) {
+                    final val riemannConfig = getRiemannConfiguration(configuration);
+                    try {
+                        riemann = new Riemann(riemannConfig.getHost(), riemannConfig.getPort());
+                        final val tags = ImmutableList.<String>builder()
+                                .add(riemannConfig.getNamespace())
+                                .add(riemannConfig.getEnvironment())
+                                .add(riemannConfig.getService())
+                                .addAll(riemannConfig.getTags())
+                                .build();
+                        RiemannReporter.Builder builder = RiemannReporter.forRegistry(environment.metrics()).tags(tags)
+                                .convertDurationsTo(TimeUnit.MILLISECONDS).convertRatesTo(TimeUnit.SECONDS);
+                        riemannReporter = builder.build(riemann);
+                        riemannReporter.start(riemannConfig.getPollingInterval(), TimeUnit.SECONDS);
+                        log.info("Started Riemann metrics reporter on {}:{} with tags: {}", riemannConfig.getHost(),
+                                riemannConfig.getPort(), Joiner.on(",").join(tags));
+                    } catch (IOException e) {
+                        log.error("Error starting Riemann reporter", e);
+                    }
+                }
             }
-        }
+
+            @Override
+            public void stop() throws Exception {
+                if(riemannReporter != null) {
+                    riemannReporter.stop();
+                }
+                if(riemann != null) {
+                    riemann.close();
+                }
+            }
+        });
     }
 }
