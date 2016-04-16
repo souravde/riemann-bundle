@@ -1,4 +1,4 @@
-# Dropwizard XML Bundle [![Travis build status](https://travis-ci.org/phaneesh/riemann-bundle.svg?branch=master)](https://travis-ci.org/phaneesh/riemann-bundle)
+# Dropwizard Riemann Bundle [![Travis build status](https://travis-ci.org/phaneesh/riemann-bundle.svg?branch=master)](https://travis-ci.org/phaneesh/riemann-bundle)
 
 This bundle simplifies integrating dropwizard metrics with [Riemann](http://riemann.io/).
 This bundle compiles only on Java 8.
@@ -50,6 +50,22 @@ Use the following maven dependency:
             }
         });
     }
+```
+
+### Configuration
+```
+riemann:
+  host: my.riemann.host
+  port: 5556
+  namespace: mycompany
+  service: myservice
+  environment: myenvironment
+  prefix: Bearer
+  pollingInterval: 60 
+  tags:
+    - mytag1
+    - mytag2
+    - mytag3
 ```
 
 LICENSE
