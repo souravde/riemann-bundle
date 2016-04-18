@@ -39,13 +39,7 @@ public class RiemannConfig {
     private int port = 5556;
 
     @NotEmpty
-    private String namespace = "default";
-
-    @NotEmpty
-    private String service;
-
-    @NotEmpty
-    private String environment = "default";
+    private String prefix;
 
     @Max(3600)
     @Min(10)

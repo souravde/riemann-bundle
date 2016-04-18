@@ -57,9 +57,7 @@ Use the following maven dependency:
 riemann:
   host: my.riemann.host
   port: 5556
-  namespace: mycompany
-  service: myservice
-  environment: myenvironment
+  prefix: mycompany.myenvironment.myservice
   pollingInterval: 60 
   tags:
     - mytag1

@@ -56,22 +56,14 @@ public abstract class RiemannBundle<T extends Configuration> implements Configur
                     final val riemannConfig = getRiemannConfiguration(configuration);
                     try {
                         riemann = new Riemann(riemannConfig.getHost(), riemannConfig.getPort());
-                        final val tags = ImmutableList.<String>builder()
-                                .add(riemannConfig.getNamespace())
-                                .add(riemannConfig.getEnvironment())
-                                .add(riemannConfig.getService())
-                                .addAll(riemannConfig.getTags())
-                                .build();
-                        RiemannReporter.Builder builder = RiemannReporter.forRegistry(environment.metrics()).tags(tags)
-                                .prefixedWith(Joiner.on(".")
-                                        .join(riemannConfig.getNamespace(), riemannConfig.getEnvironment(),
-                                                riemannConfig.getService()))
+                        RiemannReporter.Builder builder = RiemannReporter.forRegistry(environment.metrics()).tags(riemannConfig.getTags())
+                                .prefixedWith(riemannConfig.getPrefix())
                                 .useSeparator(".")
                                 .convertDurationsTo(TimeUnit.MILLISECONDS).convertRatesTo(TimeUnit.SECONDS);
                         riemannReporter = builder.build(riemann);
                         riemannReporter.start(riemannConfig.getPollingInterval(), TimeUnit.SECONDS);
-                        log.info("Started Riemann metrics reporter on {}:{} with tags: {}", riemannConfig.getHost(),
-                                riemannConfig.getPort(), Joiner.on(",").join(tags));
+                        log.info("Started Riemann metrics reporter on {}:{} with prefix {} and tagged with: {}", riemannConfig.getHost(),
+                                riemannConfig.getPort(), riemannConfig.getPrefix(), Joiner.on(",").join(riemannConfig.getTags()));
                     } catch (IOException e) {
                         log.error("Error starting Riemann reporter", e);
                     }
