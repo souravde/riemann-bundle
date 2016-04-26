@@ -30,9 +30,9 @@ Use the following repository:
 Use the following maven dependency:
 ```xml
 <dependency>
-    <groupId>io.dropwizard.riemann</groupId>
-    <artifactId>riemann-bundle</artifactId>
-    <version>0.9.2-SNAPSHOT</version>
+    <groupId>io.dropwizard</groupId>
+    <artifactId>dropwizard-riemann</artifactId>
+    <version>1.0.0-rc2-SNAPSHOT</version>
 </dependency>
 ```
 
