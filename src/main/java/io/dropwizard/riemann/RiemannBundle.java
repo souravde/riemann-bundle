@@ -15,6 +15,7 @@
  */
 package io.dropwizard.riemann;
 
+import com.codahale.metrics.riemann.DropWizardRiemannReporter;
 import com.codahale.metrics.riemann.Riemann;
 import com.codahale.metrics.riemann.RiemannReporter;
 import com.google.common.base.Joiner;
@@ -38,7 +39,7 @@ public abstract class RiemannBundle<T extends Configuration> implements Configur
 
     private static Riemann riemann;
 
-    private static RiemannReporter riemannReporter;
+    private static DropWizardRiemannReporter riemannReporter;
 
     public abstract RiemannConfig getRiemannConfiguration(T configuration);
 
@@ -56,7 +57,8 @@ public abstract class RiemannBundle<T extends Configuration> implements Configur
                     final val riemannConfig = getRiemannConfiguration(configuration);
                     try {
                         riemann = new Riemann(riemannConfig.getHost(), riemannConfig.getPort());
-                        RiemannReporter.Builder builder = RiemannReporter.forRegistry(environment.metrics()).tags(riemannConfig.getTags())
+                        DropWizardRiemannReporter.Builder builder = DropWizardRiemannReporter.forRegistry(environment.metrics())
+                                .tags(riemannConfig.getTags())
                                 .prefixedWith(riemannConfig.getPrefix())
                                 .useSeparator(".")
                                 .convertDurationsTo(TimeUnit.MILLISECONDS).convertRatesTo(TimeUnit.SECONDS);
