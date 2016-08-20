@@ -19,6 +19,7 @@ import com.codahale.metrics.riemann.DropWizardRiemannReporter;
 import com.codahale.metrics.riemann.Riemann;
 import com.codahale.metrics.riemann.RiemannReporter;
 import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import io.dropwizard.Configuration;
 import io.dropwizard.ConfiguredBundle;
@@ -55,6 +56,10 @@ public abstract class RiemannBundle<T extends Configuration> implements Configur
             public void start() throws Exception {
                 if (riemann == null) {
                     final val riemannConfig = getRiemannConfiguration(configuration);
+                    if(riemannConfig == null || Strings.isNullOrEmpty(riemannConfig.getHost())) {
+                        log.warn("No valid reimann host found!. Cannot start reimann bundle");
+                        return;
+                    }
                     try {
                         riemann = new Riemann(riemannConfig.getHost(), riemannConfig.getPort());
                         DropWizardRiemannReporter.Builder builder = DropWizardRiemannReporter.forRegistry(environment.metrics())
