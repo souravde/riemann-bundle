@@ -72,7 +72,7 @@ public abstract class RiemannBundle<T extends Configuration> implements Configur
                         log.info("Started Riemann metrics reporter on {}:{} with prefix {} and tagged with: {}", riemannConfig.getHost(),
                                 riemannConfig.getPort(), riemannConfig.getPrefix(), Joiner.on(",").join(riemannConfig.getTags()));
                     } catch (IOException e) {
-                        log.error("Error starting Riemann reporter", e);
+                        log.error("Error starting Riemann reporter: ", e.getMessage());
                     }
                 }
             }
