@@ -30,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -61,11 +62,16 @@ public abstract class RiemannBundle<T extends Configuration> implements Configur
                         return;
                     }
                     try {
+                        String host = System.getenv("HOST");
+                        if(host == null) {
+                            host = InetAddress.getLocalHost().getHostName();
+                        }
                         riemann = new Riemann(riemannConfig.getHost(), riemannConfig.getPort());
                         DropWizardRiemannReporter.Builder builder = DropWizardRiemannReporter.forRegistry(environment.metrics())
                                 .tags(riemannConfig.getTags())
                                 .prefixedWith(riemannConfig.getPrefix())
                                 .useSeparator(".")
+                                .localHost(host)
                                 .convertDurationsTo(TimeUnit.MILLISECONDS).convertRatesTo(TimeUnit.SECONDS);
                         riemannReporter = builder.build(riemann);
                         riemannReporter.start(riemannConfig.getPollingInterval(), TimeUnit.SECONDS);
